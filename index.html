@@ -64,9 +64,9 @@
 
     .subtitle {
       margin: 8px 0 0;
-      color: #e2eee5;
-      font-size: 1rem;
-      font-weight: 600;
+      color: #ff9f1c;
+      font-size: 1.35rem;
+      font-weight: 800;
     }
 
     .count {
@@ -170,9 +170,10 @@
     tr:last-child td { border-bottom: 0; }
     tbody tr:hover { background: #fafcf9; }
     .row-number { width: 52px; text-align: center; color: #89928b; background: #f7f8f6; }
-    .name-col { width: 40%; }
-    .amount-col { width: 25%; }
-    .time-col { width: 35%; }
+    .name-col { width: 34%; }
+    .amount-col { width: 20%; }
+    .time-col { width: 24%; }
+    .asked-col { width: 22%; text-align: center; }
     .actions-col { width: 104px; text-align: center; }
     .person { font-weight: 700; }
     .money { color: var(--green-dark); font-weight: 800; font-variant-numeric: tabular-nums; }
@@ -246,7 +247,7 @@
     <div class="topbar-inner">
       <div>
         <h1>টাকা নিয়ে না দেওয়া শালার পুতেদের তালিকা</h1>
-        <p class="subtitle">স্বল্প মাত্রায় ঋণখেলাপিরা</p>
+        <p class="subtitle">স্বল্প মাত্রায় ঋণখেলাপি ছ্যাঁচড়াদয়</p>
       </div>
       <div class="top-total" id="topTotalAmount">মোট ৳০</div>
       <div class="count"><strong id="personCount">0</strong> জন বাকি</div>
@@ -257,7 +258,7 @@
     <section class="sheet" aria-label="Chesra list spreadsheet">
       <div class="table-scroll">
         <table>
-          <thead><tr><th class="row-number">#</th><th class="name-col" data-sort="name">নাম ↕</th><th class="amount-col" data-sort="amount">টাকার পরিমাণ ↕</th><th class="time-col" data-sort="createdAt">সময় পার হয়েছে ↕</th></tr></thead>
+          <thead><tr><th class="row-number">#</th><th class="name-col" data-sort="name">নাম ↕</th><th class="amount-col" data-sort="amount">টাকার পরিমাণ ↕</th><th class="time-col" data-sort="createdAt">সময় পার হয়েছে ↕</th><th class="asked-col" data-sort="timesAsked">যতবার চাওয়া হয়েছে ↕</th></tr></thead>
           <tbody id="listBody"></tbody>
         </table>
       </div>
@@ -317,13 +318,15 @@
         const nameIndex = headers.indexOf('নাম');
         const amountIndex = headers.indexOf('টাকার পরিমাণ');
         const dateIndex = headers.indexOf('তারিখ');
-        if ([nameIndex, amountIndex, dateIndex].includes(-1)) throw new Error('CSV columns are missing');
+        const timesAskedIndex = headers.indexOf('যতবার চাওয়া হয়েছে');
+        if ([nameIndex, amountIndex, dateIndex, timesAskedIndex].includes(-1)) throw new Error('CSV columns are missing');
 
         entries = rows.map((row, index) => ({
           id: `csv-${index + 1}`,
           name: row[nameIndex]?.trim(),
           amount: Number(toEnglishDigits(row[amountIndex]).replace(/[^0-9.-]/g, '')),
-          createdAt: parseBanglaDate(row[dateIndex] || '')
+          createdAt: parseBanglaDate(row[dateIndex] || ''),
+          timesAsked: Number(toEnglishDigits(row[timesAskedIndex]))
         })).filter(item => item.name && Number.isFinite(item.amount) && item.createdAt);
 
         $('#emptyState strong').textContent = entries.length ? '' : 'তালিকা এখনো খালি';
@@ -347,8 +350,9 @@
     function render() {
       const visible = entries
         .sort((a, b) => {
-          const av = sortState.key === 'amount' ? Number(a.amount) : a[sortState.key].toLocaleLowerCase?.('bn') ?? a[sortState.key];
-          const bv = sortState.key === 'amount' ? Number(b.amount) : b[sortState.key].toLocaleLowerCase?.('bn') ?? b[sortState.key];
+          const numericSort = ['amount', 'timesAsked'].includes(sortState.key);
+          const av = numericSort ? Number(a[sortState.key]) : a[sortState.key].toLocaleLowerCase?.('bn') ?? a[sortState.key];
+          const bv = numericSort ? Number(b[sortState.key]) : b[sortState.key].toLocaleLowerCase?.('bn') ?? b[sortState.key];
           return (av > bv ? 1 : av < bv ? -1 : 0) * sortState.direction;
         });
 
@@ -358,6 +362,7 @@
           <td class="person">${escapeHtml(item.name)}</td>
           <td class="money">${money(item.amount)}</td>
           <td class="time" title="${new Date(item.createdAt).toLocaleString('bn-BD')}">${timePassed(item.createdAt)}</td>
+          <td class="asked-col">${bnNumber(item.timesAsked)}</td>
         </tr>`).join('');
 
       $('#emptyState').style.display = visible.length ? 'none' : 'block';
