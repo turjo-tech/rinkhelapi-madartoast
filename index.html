@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>টাকা নিয়ে না দেওয়া শালার পুতেদের তালিকা</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17211b;
+      --muted: #657168;
+      --line: #dfe5df;
+      --paper: #ffffff;
+      --canvas: #f3f5f2;
+      --green: #17683a;
+      --green-dark: #0f4d2a;
+      --green-soft: #e8f3ec;
+      --red: #b43636;
+      --shadow: 0 12px 35px rgba(31, 43, 34, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: Inter, "Noto Sans Bengali", "Hind Siliguri", system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input { font: inherit; letter-spacing: 0; }
+
+    .topbar {
+      background: var(--green-dark);
+      color: white;
+      border-bottom: 4px solid #d2a946;
+    }
+
+    .topbar-inner, main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar-inner {
+      min-height: 92px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) max-content max-content;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 0;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      color: #ffd166;
+      font-size: clamp(2rem, 4.6vw, 3.7rem);
+      line-height: 1.12;
+      text-shadow: 0 3px 0 rgba(61, 24, 9, .3);
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: #e2eee5;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .count {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      text-align: right;
+      color: #dfece3;
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+
+    .count strong { display: block; color: white; font-size: 1.55rem; line-height: 1.15; }
+
+    .top-total {
+      display: inline-block;
+      margin-top: 0;
+      justify-self: center;
+      padding: 11px 18px;
+      border: 1px solid rgba(255, 180, 180, .65);
+      border-radius: 6px;
+      background: #ffd6d6;
+      color: #8d1f1f;
+      font-size: 1.3rem;
+      font-weight: 800;
+      white-space: nowrap;
+      animation: soft-blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes soft-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .45; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .top-total { animation: none; }
+    }
+
+    main { padding: 28px 0 56px; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .search-wrap { position: relative; }
+    .search-wrap span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+
+    input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid #ccd5cd;
+      border-radius: 6px;
+      background: white;
+      color: var(--ink);
+      outline: none;
+      padding: 0 12px;
+    }
+
+    input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(23, 104, 58, .12); }
+    #search { padding-left: 40px; }
+
+    button {
+      min-height: 42px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .primary { padding: 0 18px; background: var(--green); color: white; }
+    .primary:hover { background: var(--green-dark); }
+
+    .sheet {
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    th, td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); text-align: left; }
+    th:last-child, td:last-child { border-right: 0; }
+    th {
+      height: 45px;
+      padding: 0 14px;
+      background: #edf1ed;
+      color: #4c584f;
+      font-size: .76rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    th[data-sort] { cursor: pointer; }
+    td { height: 58px; padding: 8px 14px; }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #fafcf9; }
+    .row-number { width: 52px; text-align: center; color: #89928b; background: #f7f8f6; }
+    .name-col { width: 40%; }
+    .amount-col { width: 25%; }
+    .time-col { width: 35%; }
+    .actions-col { width: 104px; text-align: center; }
+    .person { font-weight: 700; }
+    .money { color: var(--green-dark); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .time { color: var(--muted); }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .icon-btn:hover { background: var(--green-soft); color: var(--green); }
+    .icon-btn.delete:hover { background: #fbeaea; color: var(--red); }
+
+    .empty { display: none; padding: 70px 20px; text-align: center; color: var(--muted); }
+    .empty strong { display: block; color: var(--ink); font-size: 1.15rem; margin-bottom: 5px; }
+
+    .summary {
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 12px;
+      padding: 16px 18px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfa;
+    }
+
+    .summary span { color: var(--muted); font-size: .82rem; font-weight: 700; }
+    .summary strong { font-size: 1.25rem; color: var(--green-dark); }
+
+    dialog {
+      width: min(440px, calc(100% - 28px));
+      border: 0;
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 30px 80px rgba(18, 31, 22, .28);
+    }
+
+    dialog::backdrop { background: rgba(16, 26, 19, .56); }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+    .dialog-head h2 { margin: 0; font-size: 1.2rem; }
+    .close { min-height: 32px; width: 32px; background: transparent; color: var(--muted); font-size: 1.4rem; }
+    form { padding: 22px; }
+    label { display: block; margin-bottom: 16px; color: #445047; font-size: .85rem; font-weight: 700; }
+    label input { margin-top: 7px; font-weight: 400; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+    .secondary { padding: 0 16px; background: #edf0ed; color: #39443c; }
+
+    @media (max-width: 680px) {
+      .topbar-inner { min-height: 108px; grid-template-columns: 1fr auto; align-items: center; gap: 14px; }
+      .topbar-inner > div:first-child { grid-column: 1 / -1; }
+      .top-total { justify-self: start; }
+      main { width: min(100% - 20px, 1180px); padding-top: 18px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .primary { height: 44px; }
+      table { min-width: 690px; }
+      .summary { justify-content: space-between; }
+    }
+
+    @media (max-width: 480px) {
+      .topbar-inner { grid-template-columns: 1fr; gap: 14px; }
+      .count { width: 100%; align-items: flex-start; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <h1>টাকা নিয়ে না দেওয়া শালার পুতেদের তালিকা</h1>
+        <p class="subtitle">স্বল্প মাত্রায় ঋণখেলাপিরা</p>
+      </div>
+      <div class="top-total" id="topTotalAmount">মোট ৳০</div>
+      <div class="count"><strong id="personCount">0</strong> জন বাকি</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="sheet" aria-label="Chesra list spreadsheet">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th class="row-number">#</th><th class="name-col" data-sort="name">নাম ↕</th><th class="amount-col" data-sort="amount">টাকার পরিমাণ ↕</th><th class="time-col" data-sort="createdAt">সময় পার হয়েছে ↕</th></tr></thead>
+          <tbody id="listBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="emptyState"><strong>তালিকা লোড হচ্ছে...</strong></div>
+      <div class="summary"><span>মোট বাকি</span><strong id="totalAmount">৳০</strong></div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    let entries = [];
+    let sortState = { key: 'createdAt', direction: -1 };
+
+    const bnNumber = (value) => new Intl.NumberFormat('bn-BD').format(value);
+    const money = (value) => `৳${bnNumber(value)}`;
+    const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    const toEnglishDigits = (value) => String(value).replace(/[০-৯]/g, digit => '০১২৩৪৫৬৭৮৯'.indexOf(digit));
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [], field = '', quoted = false;
+      for (let index = 0; index < text.length; index++) {
+        const char = text[index];
+        if (char === '"' && quoted && text[index + 1] === '"') { field += '"'; index++; }
+        else if (char === '"') quoted = !quoted;
+        else if (char === ',' && !quoted) { row.push(field.trim()); field = ''; }
+        else if ((char === '\n' || char === '\r') && !quoted) {
+          if (char === '\r' && text[index + 1] === '\n') index++;
+          row.push(field.trim());
+          if (row.some(Boolean)) rows.push(row);
+          row = []; field = '';
+        } else field += char;
+      }
+      row.push(field.trim());
+      if (row.some(Boolean)) rows.push(row);
+      return rows;
+    }
+
+    function parseBanglaDate(value) {
+      const months = { জানুয়ারি: 1, ফেব্রুয়ারি: 2, মার্চ: 3, এপ্রিল: 4, মে: 5, জুন: 6, জুলাই: 7, আগস্ট: 8, সেপ্টেম্বর: 9, অক্টোবর: 10, নভেম্বর: 11, ডিসেম্বর: 12 };
+      const [dayText, monthText, yearText] = value.trim().split(/\s+/);
+      const day = Number(toEnglishDigits(dayText));
+      const month = months[monthText];
+      const year = Number(toEnglishDigits(yearText));
+      if (!day || !month || !year) return null;
+      return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T00:00:00+06:00`;
+    }
+
+    async function loadCsv() {
+      try {
+        const csvUrl = new URL('chesra-list.csv', window.location.href);
+        csvUrl.searchParams.set('v', Date.now());
+        const response = await fetch(csvUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const rows = parseCsv((await response.text()).replace(/^\uFEFF/, ''));
+        const headers = rows.shift() || [];
+        const nameIndex = headers.indexOf('নাম');
+        const amountIndex = headers.indexOf('টাকার পরিমাণ');
+        const dateIndex = headers.indexOf('তারিখ');
+        if ([nameIndex, amountIndex, dateIndex].includes(-1)) throw new Error('CSV columns are missing');
+
+        entries = rows.map((row, index) => ({
+          id: `csv-${index + 1}`,
+          name: row[nameIndex]?.trim(),
+          amount: Number(toEnglishDigits(row[amountIndex]).replace(/[^0-9.-]/g, '')),
+          createdAt: parseBanglaDate(row[dateIndex] || '')
+        })).filter(item => item.name && Number.isFinite(item.amount) && item.createdAt);
+
+        $('#emptyState strong').textContent = entries.length ? '' : 'তালিকা এখনো খালি';
+        render();
+      } catch (error) {
+        $('#emptyState strong').textContent = 'CSV তালিকা লোড করা যায়নি';
+        $('#emptyState').style.display = 'block';
+        $('.table-scroll').style.display = 'none';
+        console.error(error);
+      }
+    }
+
+    function timePassed(dateString) {
+      const seconds = Math.max(0, Math.floor((Date.now() - new Date(dateString).getTime()) / 1000));
+      if (seconds < 60) return 'এইমাত্র';
+      const units = [[31536000, 'বছর'], [2592000, 'মাস'], [86400, 'দিন'], [3600, 'ঘণ্টা'], [60, 'মিনিট']];
+      const [size, label] = units.find(([size]) => seconds >= size);
+      return `${bnNumber(Math.floor(seconds / size))} ${label} আগে`;
+    }
+
+    function render() {
+      const visible = entries
+        .sort((a, b) => {
+          const av = sortState.key === 'amount' ? Number(a.amount) : a[sortState.key].toLocaleLowerCase?.('bn') ?? a[sortState.key];
+          const bv = sortState.key === 'amount' ? Number(b.amount) : b[sortState.key].toLocaleLowerCase?.('bn') ?? b[sortState.key];
+          return (av > bv ? 1 : av < bv ? -1 : 0) * sortState.direction;
+        });
+
+      $('#listBody').innerHTML = visible.map((item, index) => `
+        <tr>
+          <td class="row-number">${bnNumber(index + 1)}</td>
+          <td class="person">${escapeHtml(item.name)}</td>
+          <td class="money">${money(item.amount)}</td>
+          <td class="time" title="${new Date(item.createdAt).toLocaleString('bn-BD')}">${timePassed(item.createdAt)}</td>
+        </tr>`).join('');
+
+      $('#emptyState').style.display = visible.length ? 'none' : 'block';
+      $('.table-scroll').style.display = visible.length ? 'block' : 'none';
+      $('#personCount').textContent = bnNumber(entries.length);
+      const total = entries.reduce((sum, item) => sum + Number(item.amount), 0);
+      $('#totalAmount').textContent = money(total);
+      $('#topTotalAmount').textContent = `মোট ${money(total)}`;
+    }
+
+    document.querySelectorAll('th[data-sort]').forEach(th => th.addEventListener('click', () => {
+      sortState = { key: th.dataset.sort, direction: sortState.key === th.dataset.sort ? -sortState.direction : 1 };
+      render();
+    }));
+
+    loadCsv();
+    setInterval(render, 60000);
+  </script>
+</body>
+</html>
