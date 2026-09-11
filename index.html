@@ -9,9 +9,9 @@
       color-scheme: light;
       --ink: #17211b;
       --muted: #657168;
-      --line: #dfe5df;
+      --line: #edc58d;
       --paper: #ffffff;
-      --canvas: #f3f5f2;
+      --canvas: #fff7eb;
       --green: #17683a;
       --green-dark: #0f4d2a;
       --green-soft: #e8f3ec;
@@ -28,15 +28,17 @@
       background: var(--canvas);
       color: var(--ink);
       font-family: Inter, "Noto Sans Bengali", "Hind Siliguri", system-ui, sans-serif;
+      font-size: 17px;
+      font-weight: 700;
       letter-spacing: 0;
     }
 
     button, input { font: inherit; letter-spacing: 0; }
 
     .topbar {
-      background: var(--green-dark);
-      color: white;
-      border-bottom: 4px solid #d2a946;
+      background: #ffc766;
+      color: #000;
+      border-bottom: 5px solid #e87500;
     }
 
     .topbar-inner, main {
@@ -56,16 +58,16 @@
     h1 {
       margin: 0;
       max-width: 760px;
-      color: #ffd166;
-      font-size: clamp(2rem, 4.6vw, 3.7rem);
+      color: #000;
+      font-size: clamp(2.15rem, 4.8vw, 3.9rem);
       line-height: 1.12;
       text-shadow: 0 3px 0 rgba(61, 24, 9, .3);
     }
 
     .subtitle {
       margin: 8px 0 0;
-      color: #ff9f1c;
-      font-size: 1.35rem;
+      color: #000;
+      font-size: 1.5rem;
       font-weight: 800;
     }
 
@@ -75,31 +77,31 @@
       align-items: flex-end;
       gap: 8px;
       text-align: right;
-      color: #dfece3;
-      font-size: .82rem;
+      color: #000;
+      font-size: 1rem;
       white-space: nowrap;
     }
 
-    .count strong { display: block; color: white; font-size: 1.55rem; line-height: 1.15; }
+    .count strong { display: block; color: #000; font-size: 1.7rem; line-height: 1.15; }
 
     .top-total {
       display: inline-block;
       margin-top: 0;
       justify-self: center;
       padding: 11px 18px;
-      border: 1px solid rgba(255, 180, 180, .65);
+      border: 2px solid #b91c1c;
       border-radius: 6px;
-      background: #ffd6d6;
-      color: #8d1f1f;
-      font-size: 1.3rem;
+      background: #ef4444;
+      color: #000;
+      font-size: 1.45rem;
       font-weight: 800;
       white-space: nowrap;
       animation: soft-blink 1.5s ease-in-out infinite;
     }
 
     @keyframes soft-blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: .45; }
+      0%, 100% { background-color: #ef4444; border-color: #b91c1c; box-shadow: 0 0 0 rgba(185, 28, 28, 0); }
+      50% { background-color: #fecaca; border-color: #ef4444; box-shadow: 0 0 14px rgba(185, 28, 28, .5); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -129,7 +131,7 @@
       padding: 0 12px;
     }
 
-    input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(23, 104, 58, .12); }
+    input:focus { border-color: #e87500; box-shadow: 0 0 0 3px rgba(232, 117, 0, .16); }
     #search { padding-left: 40px; }
 
     button {
@@ -158,9 +160,9 @@
     th {
       height: 45px;
       padding: 0 14px;
-      background: #edf1ed;
-      color: #4c584f;
-      font-size: .76rem;
+      background: #ffe0ad;
+      color: #000;
+      font-size: .88rem;
       text-transform: uppercase;
       white-space: nowrap;
     }
@@ -168,16 +170,16 @@
     th[data-sort] { cursor: pointer; }
     td { height: 58px; padding: 8px 14px; }
     tr:last-child td { border-bottom: 0; }
-    tbody tr:hover { background: #fafcf9; }
-    .row-number { width: 52px; text-align: center; color: #89928b; background: #f7f8f6; }
+    tbody tr:hover { background: #fff2dc; }
+    .row-number { width: 52px; text-align: center; color: #000; background: #fff4e2; }
     .name-col { width: 34%; }
     .amount-col { width: 20%; }
     .time-col { width: 24%; }
     .asked-col { width: 22%; text-align: center; }
     .actions-col { width: 104px; text-align: center; }
-    .person { font-weight: 700; }
-    .money { color: var(--green-dark); font-weight: 800; font-variant-numeric: tabular-nums; }
-    .time { color: var(--muted); }
+    .person { color: #000; font-weight: 800; }
+    .money { color: #000; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .time { color: #000; font-weight: 800; }
 
     .icon-btn {
       width: 34px;
@@ -201,11 +203,11 @@
       gap: 12px;
       padding: 16px 18px;
       border-top: 1px solid var(--line);
-      background: #fbfcfa;
+      background: #fff0d5;
     }
 
-    .summary span { color: var(--muted); font-size: .82rem; font-weight: 700; }
-    .summary strong { font-size: 1.25rem; color: var(--green-dark); }
+    .summary span { color: #000; font-size: .95rem; font-weight: 800; }
+    .summary strong { font-size: 1.4rem; color: #000; }
 
     dialog {
       width: min(440px, calc(100% - 28px));
@@ -246,7 +248,7 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div>
-        <h1>টাকা নিয়ে না দেওয়া শালার পুতেদের তালিকা</h1>
+        <h1>টাকা নিয়ে না দেওয়া শালার পুতদের তালিকা</h1>
         <p class="subtitle">স্বল্প মাত্রায় ঋণখেলাপি ছ্যাঁচড়াদয়</p>
       </div>
       <div class="top-total" id="topTotalAmount">মোট ৳০</div>
